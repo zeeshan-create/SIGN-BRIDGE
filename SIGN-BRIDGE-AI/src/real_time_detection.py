@@ -129,8 +129,16 @@ class InferenceEngine:
         # Prefer TFLite for ~5-10x faster inference
         if os.path.exists(TFLITE_PATH):
             try:
-                import tensorflow as tf
-                self._interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
+                # Try tflite_runtime first (production, smaller), fall back to tensorflow (development)
+                try:
+                    from tflite_runtime.interpreter import Interpreter
+                    print("[Engine] Using tflite_runtime (production optimized)")
+                except ImportError:
+                    import tensorflow as tf
+                    Interpreter = tf.lite.Interpreter
+                    print("[Engine] Using tensorflow.lite (development)")
+                
+                self._interpreter = Interpreter(model_path=TFLITE_PATH)
                 self._interpreter.allocate_tensors()
                 self._input_details = self._interpreter.get_input_details()
                 self._output_details = self._interpreter.get_output_details()
@@ -141,13 +149,16 @@ class InferenceEngine:
             except Exception as e:
                 print(f"[Engine] TFLite load failed ({e}), falling back to Keras")
 
-        # Fallback to Keras
+        # Fallback to Keras (requires full TensorFlow - not recommended for production)
         if os.path.exists(KERAS_PATH):
             try:
                 import tensorflow as tf
                 self._keras_model = tf.keras.models.load_model(KERAS_PATH)
                 input_shape = self._keras_model.input_shape
                 print(f"[Engine] Keras model loaded (input shape: {input_shape})")
+            except ImportError:
+                print("[Error] Full TensorFlow not installed. Install tensorflow package for Keras support.")
+                raise SystemExit(1)
             except Exception as e:
                 print(f"[Error] Cannot load any model: {e}")
                 raise SystemExit(1)

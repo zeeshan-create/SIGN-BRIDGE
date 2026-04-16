@@ -1,30 +1,32 @@
-# SignBridge AI - Optimized Multi-Stage Dockerfile for Railway
-# ============================================================
-# Reduces image size from 8.8GB to ~3GB using multi-stage build
-# TensorFlow Lite is used instead of full TensorFlow where possible
+# SignBridge AI - Production Dockerfile for Railway
+# ==================================================
+# Key optimizations:
+#   - Uses requirements.prod.txt (tflite-runtime vs full tensorflow = -2GB!)
+#   - opencv-python-headless (no GUI libs = -500MB!)
+#   - Multi-stage build (no build tools in final image)
+#   - Removed unused packages: PyAudio, pygame, matplotlib, etc.
+#
+# Estimated final size: ~1.5-2GB (down from 8.8GB)
 
 # Stage 1: Builder - Compile Python packages
 FROM python:3.11-slim as builder
 
-# Install build dependencies
+# Install build dependencies (only for compiling Python packages)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     python3-dev \
-    libportaudio2 \
-    portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy and install requirements
-COPY requirements.txt .
+# Copy and install production requirements
+COPY requirements.prod.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir wheel && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir gunicorn eventlet
+    pip install --no-cache-dir -r requirements.prod.txt
 
 # Stage 2: Runtime - Minimal image with compiled packages
 FROM python:3.11-slim
@@ -37,7 +39,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:$PATH" \
     PYTHONPATH="/opt/venv/lib/python3.11/site-packages"
 
-# Install ONLY runtime system dependencies (no -dev packages)
+# Install ONLY runtime system dependencies (no -dev packages, no audio libs)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
@@ -50,7 +52,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-6 \
     libharfbuzz0b \
     libfreetype6 \
-    libportaudio2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
