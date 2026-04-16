@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=5000 \
     PYTHONFAULTHANDLER=1
 
-# Install system dependencies for OpenCV, MediaPipe, and TensorFlow
+# Install system dependencies for OpenCV, MediaPipe, TensorFlow, and PyAudio
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
@@ -23,6 +23,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-6 \
     libharfbuzz0b \
     libfreetype6 \
+    portaudio19-dev \
+    gcc \
+    python3-dev \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
