@@ -33,7 +33,6 @@ LICENSE.txt
 
 # Logs and temp files
 *.log
-*.txt
 output.txt
 output_utf8.txt
 error_log.txt
@@ -43,6 +42,7 @@ bridge_original.txt
 run_output.txt
 rtd_diff.txt
 git_changes.txt
+# Keep requirements.txt - needed for build
 
 # Local data (will use Railway volumes instead)
 # uploads/  # Keep for initial setup, use volume in production
