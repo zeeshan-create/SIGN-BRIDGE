@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { io } from 'socket.io-client';
 
 // Global Framer Motion performance optimizations
 motion.defaults.layoutAnimations = false;
@@ -21,6 +22,9 @@ import { AuthProvider, useAuth } from './AuthContext';
 import { ThemeProvider } from './ThemeContext';
 import ErrorBoundary from './ErrorBoundary';
 
+// Connect to the Node.js backend
+const socket = io(import.meta.env.VITE_SERVER_URL || 'http://localhost:5000');
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -31,7 +35,7 @@ function ProtectedRoute({ children }) {
 function AdminProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user || user.role !== 'admin') return <Dashboard />;
+  if (!user || user.role !== 'admin') return <Dashboard socket={socket} />;
   return children;
 }
 
@@ -80,16 +84,16 @@ function AnimatedRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/faq" element={<FAQ socket={socket} />} />
+        <Route path="/contact" element={<Contact socket={socket} />} />
         <Route path="/blog" element={<Blog />} />
 
-        <Route path="/converter" element={<Converter />} />
+        <Route path="/converter" element={<Converter socket={socket} />} />
         <Route 
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Dashboard socket={socket} />
             </ProtectedRoute>
           } 
         />

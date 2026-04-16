@@ -139,7 +139,7 @@ const CategoryGrid = () => {
   );
 };
 
-function Dashboard({ onBack }) {
+function Dashboard({ socket, onBack }) {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -152,13 +152,43 @@ function Dashboard({ onBack }) {
   const [uploading, setUploading] = useState(false);
   const [startFrame, setStartFrame] = useState(0);
 
+  useEffect(() => {
+    socket.on('prediction', (data) => {
+      console.log('[Dashboard] Received prediction:', data);
+      if (data.image) {
+        setImage(`data:image/jpeg;base64,${data.image}`);
+      }
+      setDetection({
+        sign: data.sign,
+        sentence: data.sentence,
+        mode: data.mode,
+        fps: data.fps
+      });
+    });
+    socket.on('stream_status', (data) => {
+      console.log('[Dashboard] Stream status:', data);
+    });
+    socket.on('history_updated', (data) => {
+      console.log('[Dashboard] History updated:', data);
+      setHistory(data);
+    });
+    socket.emit('get_history');
+    return () => {
+      socket.off('prediction');
+      socket.off('stream_status');
+      socket.off('history_updated');
+    };
+  }, [socket]);
 
   const toggleCamera = () => {
+    if (!active) socket.emit('start_detection');
+    else socket.emit('stop_detection');
     setActive(!active);
   };
 
   const handleModeSwitch = (mode) => {
     setLexiconMode(mode);
+    socket.emit('set_mode', mode);
   };
 
   const downloadHistory = () => {
@@ -439,7 +469,7 @@ function Dashboard({ onBack }) {
                         </div>
 
                         <button 
-                          onClick={() => setDetection({ ...detection, sentence: '' })}
+                          onClick={() => socket.emit('clear_sentence')}
                           className="absolute bottom-6 md:bottom-10 right-6 md:right-10 p-3 md:p-4 bg-white/5 hover:bg-white/10 text-white/30 hover:text-white rounded-xl md:rounded-2xl border border-white/5 transition-all"
                         >
                           <RefreshCcw size={18} />
@@ -456,7 +486,7 @@ function Dashboard({ onBack }) {
                               <button onClick={downloadHistory} className="p-2.5 md:p-3 bg-[#16A34A]/10 text-[#16A34A] rounded-lg md:rounded-xl border border-[var(--border-color)] hover:bg-[#16A34A] hover:text-white transition-all">
                                  <Download size={18} />
                               </button>
-                              <button onClick={() => setHistory([])} className="p-2.5 md:p-3 bg-red-500/10 text-red-500 rounded-lg md:rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-all">
+                              <button onClick={() => socket.emit('clear_history')} className="p-2.5 md:p-3 bg-red-500/10 text-red-500 rounded-lg md:rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-all">
                                  <RefreshCcw size={18} />
                               </button>
                            </div>
