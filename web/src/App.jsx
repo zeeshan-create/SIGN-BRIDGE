@@ -21,9 +21,10 @@ import Blog from './Blog';
 import { AuthProvider, useAuth } from './AuthContext';
 import { ThemeProvider } from './ThemeContext';
 import ErrorBoundary from './ErrorBoundary';
+import { API_BASE_URL } from './constants';
 
 // Connect to the Node.js backend
-const socket = io(import.meta.env.VITE_SERVER_URL || 'http://localhost:5000');
+const socket = io(API_BASE_URL);
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
