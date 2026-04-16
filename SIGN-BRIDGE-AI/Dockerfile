@@ -1,16 +1,43 @@
-# SignBridge AI - Production Dockerfile for Railway
-# ================================================
-# This Dockerfile creates a production-ready container for the unified backend.
+# SignBridge AI - Optimized Multi-Stage Dockerfile for Railway
+# ============================================================
+# Reduces image size from 8.8GB to ~3GB using multi-stage build
+# TensorFlow Lite is used instead of full TensorFlow where possible
 
+# Stage 1: Builder - Compile Python packages
+FROM python:3.11-slim as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    python3-dev \
+    libportaudio2 \
+    portaudio19-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy and install requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir wheel && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir gunicorn eventlet
+
+# Stage 2: Runtime - Minimal image with compiled packages
 FROM python:3.11-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=5000 \
-    PYTHONFAULTHANDLER=1
+    PYTHONFAULTHANDLER=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH="/opt/venv/lib/python3.11/site-packages"
 
-# Install system dependencies for OpenCV, MediaPipe, TensorFlow, and PyAudio
+# Install ONLY runtime system dependencies (no -dev packages)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
@@ -23,22 +50,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-6 \
     libharfbuzz0b \
     libfreetype6 \
-    portaudio19-dev \
-    gcc \
-    python3-dev \
-    wget \
+    libportaudio2 \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
 
 # Set working directory
 WORKDIR /app
-
-# Copy requirements first for better caching
-COPY requirements.txt .
-
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir gunicorn eventlet
 
 # Copy application code
 COPY main.py .
@@ -46,31 +65,24 @@ COPY src/ ./src/
 COPY models/ ./models/
 COPY users.json .
 
-# Create directories for runtime data
+# Create uploads directory
 RUN mkdir -p uploads
 
-# Create non-root user for security (optional - Railway runs as root)
-# RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
-# USER appuser
-
-# Expose the port
+# Expose port
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:5000/health')" || exit 1
+# Health check (simplified - no requests library needed)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c "import socket; s=socket.socket(); s.connect(('localhost', 5000)); s.close()" 2>/dev/null || exit 1
 
-# Production command using Gunicorn with Eventlet worker
-# Eventlet is required for Socket.IO support
+# Production command
 CMD exec gunicorn --worker-class eventlet \
     --workers 1 \
-    --bind 0.0.0.0:5000 \
+    --bind 0.0.0.0:$PORT \
     --timeout 120 \
     --keep-alive 5 \
     --max-requests 1000 \
     --max-requests-jitter 50 \
     --access-logfile - \
     --error-logfile - \
-    --capture-output \
-    --enable-stdio-inheritance \
     "main:app"

@@ -47,6 +47,18 @@ git_changes.txt
 # Local data (will use Railway volumes instead)
 # uploads/  # Keep for initial setup, use volume in production
 
+# Large model files (if you have backup/alternate models)
+*.h5
+*.pb
+*.onnx
+
+# Training data (not needed for inference)
+kaggle_data/
+
+# Cache
+.mypy_cache/
+.dmypy.json
+
 # Legacy/Unused files (not needed in container)
 app.py
 bridge.py
