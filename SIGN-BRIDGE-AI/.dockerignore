@@ -1,0 +1,68 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation
+README.md
+CONTRIBUTING.md
+LICENSE
+LICENSE.txt
+
+# Logs and temp files
+*.log
+*.txt
+output.txt
+output_utf8.txt
+error_log.txt
+bridge_error.txt
+bridge_output.log
+bridge_original.txt
+run_output.txt
+rtd_diff.txt
+git_changes.txt
+
+# Local data (will use Railway volumes instead)
+# uploads/  # Keep for initial setup, use volume in production
+
+# Legacy/Unused files (not needed in container)
+app.py
+bridge.py
+bridge.py.restored
+templates/
+scratch/
+kaggle_data/
+
+# Frontend (deploy separately)
+web/
+node_modules/
+
+# Railway config (not needed in image)
+railway.json
+.netlify.toml
+
+# Misc
+.DS_Store
+Thumbs.db

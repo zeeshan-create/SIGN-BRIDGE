@@ -1,0 +1,216 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+:root {
+  --white: #ffffff;
+  --off-white: #f9fafb;
+  --emerald: #10b981;
+  --slate-900: #111827;
+  --slate-600: #4b5563;
+  --slate-200: #e5e7eb;
+
+  /* Theme-aware variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #9ca3af;
+  --border-color: #e5e7eb;
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --emerald-alpha: rgba(16, 185, 129, 0.1);
+  --header-bg: rgba(0, 0, 0, 0.95); /* Header is always dark for premium home bar feel */
+}
+
+/* Dark Mode Overrides */
+:root.dark {
+  --bg-primary: #02140A; /* Deep Verdant Black */
+  --bg-secondary: #052E16; /* Sidebar Green */
+  --bg-tertiary: #0A3D20;
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-tertiary: #9ca3af;
+  --border-color: rgba(187, 247, 208, 0.15); /* Soft emerald borders */
+  --nav-bg: rgba(2, 20, 10, 0.95);
+  --emerald-alpha: rgba(16, 185, 129, 0.2);
+}
+
+/* Global Smooth Animations System */
+html {
+  scroll-behavior: smooth;
+  @apply transition-colors duration-300;
+}
+
+/* Theme transition disable during load if needed, but here we want smooth transitions */
+*, *::before, *::after {
+  @apply transition-colors duration-300;
+}
+
+/* Performance Optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Disable expensive paint operations during scroll */
+.disable-paint-during-scroll {
+  contain: layout paint style;
+}
+
+/* Optimize sticky elements */
+.sticky-optimized {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  contain: layout paint style;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  @apply antialiased selection:bg-green-100 dark:selection:bg-green-900;
+  font-family: var(--font-inter);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Logo inversion for Dark Mode */
+.dark img[alt="SignBridge"], 
+.dark img[src="/logo.png"] {
+  filter: invert(1) brightness(2);
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, input, select, textarea, [role="button"] {
+  @apply motion-safe:transition-colors motion-safe:transition-transform motion-safe:transition-opacity motion-safe:transition-shadow motion-safe:duration-200 motion-safe:ease-out;
+}
+
+/* Custom easing functions for natural motion */
+@layer utilities {
+  .ease-smooth {
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .ease-bounce-natural {
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .animate-hover-lift {
+    @apply transition-transform duration-250 ease-smooth;
+  }
+  .animate-hover-lift:hover {
+    transform: translateY(-2px);
+  }
+  /* GPU acceleration helper */
+  .gpu-accelerate {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  /* Reduced motion respect */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+h1, h2, h3, h4 {
+  @apply font-bold tracking-tight text-[#111827];
+  line-height: 1.15;
+}
+
+/* Stripe/Apple Style Elevation */
+.shadow-stripe {
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.1), 
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-stripe-hover {
+  @apply transition-transform transition-shadow duration-250 ease-smooth;
+}
+.shadow-stripe-hover:hover {
+  will-change: transform;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Buttons */
+.btn-emerald {
+  @apply bg-[#10b981] text-white px-6 py-3 rounded-lg font-semibold transition-transform transition-shadow transition-colors duration-250 ease-smooth active:scale-[0.98] hover:bg-[#059669] shadow-sm;
+}
+
+.btn-emerald:hover, .lit-hover:hover {
+  will-change: transform;
+  box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-white {
+  @apply bg-white text-[#4b5563] border border-[#e5e7eb] px-6 py-3 rounded-lg font-semibold transition-transform transition-shadow transition-colors duration-250 ease-smooth hover:bg-[#f9fafb] hover:border-[#d1d5db];
+}
+
+.btn-white:hover {
+  will-change: transform;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Cleanup for navigation links */
+.nav-link-clean {
+  @apply text-[0.7rem] font-black uppercase tracking-[0.25em] transition-all duration-200 ease-smooth;
+}
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-transform transition-shadow duration-300 ease-smooth;
+}
+.card-hover:hover {
+  will-change: transform;
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+}
+
+/* Dividers */
+.hr-stripe {
+  @apply h-px bg-[#f3f4f6] border-none my-8;
+}

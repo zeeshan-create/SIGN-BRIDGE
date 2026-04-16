@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Zeeshan",
+    "email": "zk45681@gmail.com",
+    "password": "$2b$10$YYmkxabjU4CkA56P1dfi2.7fsSw0Q31lH/5zNEOQY2j5LAJHEbgoa",
+    "role": "admin"
+  },
+  {
+    "id": 1776247837988,
+    "name": "qwd",
+    "email": "3xgen5exxf@ruutukf.com",
+    "password": "$2b$10$jyIiBgAzMV6EvSan.axDa.//KDRJCnh5ytt98bomGdRjDtCsFBoTC",
+    "role": "user"
+  },
+  {
+    "id": 1776247920744,
+    "name": "Ziffy Star",
+    "email": "ziffystar06@gmail.com",
+    "googleId": "114955595426203022273",
+    "role": "user",
+    "image": "https://lh3.googleusercontent.com/a/ACg8ocJ2HRx-9sBN9sZSzx8gzLwnN3lVITI9zE2kHcftCRhsLxGkjw=s96-c"
+  },
+  {
+    "id": 1776276076073,
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2b$10$7oNLaXoYbBjMOCh6DUGvIuXOavavfQ6ZbviHbrF49/UUVzXCqwSdK",
+    "role": "user"
+  },
+  {
+    "id": 1776322906196,
+    "name": "DYNAMO ROCKSTARS",
+    "email": "rizwanhussain1912@gmail.com",
+    "googleId": "108136127129342240644",
+    "role": "user",
+    "image": "https://lh3.googleusercontent.com/a/ACg8ocK7vUC_vT32roX14SmSxUi37eFfaULhZdtzsHYKOXBwp4BXdETHsQ=s96-c"
+  },
+  {
+    "id": 1776334631155,
+    "name": "newuser@gmail.com",
+    "email": "newuser@gmail.com",
+    "password": "$2b$10$ObSFb0KZaZ/1..TaOWbOgOt48N4nm0MOkwdozxirqzAJZMip.fGIa",
+    "role": "user"
+  }
+]

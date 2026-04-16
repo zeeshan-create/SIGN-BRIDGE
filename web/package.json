@@ -1,0 +1,62 @@
+{
+  "name": "signbridge-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3003",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@react-oauth/google": "^0.13.5",
+    "axios": "^1.5.1",
+    "clsx": "^2.0.0",
+    "framer-motion": "^10.16.4",
+    "lucide-react": "^0.284.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.14.0",
+    "socket.io-client": "^4.7.2",
+    "tailwind-merge": "^1.14.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-react": "^7.28.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.16",
+    "babel-jest": "^30.3.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "postcss": "^8.4.30",
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.5",
+    "vite-plugin-pwa": "^1.2.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFiles": [
+      "<rootDir>/src/polyfills.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "transform": {
+      "^.+\\.(js|jsx)$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@testing-library)/)"
+    ]
+  }
+}
